@@ -226,9 +226,42 @@ body.panel-document:not(.is-premium) .panel-page {
 .main-nav a {
   position: relative;
   overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   border-radius: 999px;
-  padding: 9px 13px;
+  padding: 8px 12px 8px 9px;
   transition: color 220ms ease, background 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.nav-icon {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  color: #ffe9a8;
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1;
+  background:
+    radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.22), transparent 42%),
+    linear-gradient(145deg, rgba(255, 79, 179, 0.2), rgba(255, 211, 111, 0.09));
+  box-shadow: 0 0 14px rgba(255, 79, 179, 0.14);
+}
+
+.main-nav a:hover .nav-icon,
+.main-nav a:focus-visible .nav-icon,
+.main-nav a.is-active .nav-icon {
+  border-color: rgba(255, 211, 111, 0.42);
+  color: #fff7c9;
+  box-shadow:
+    0 0 14px rgba(255, 211, 111, 0.24),
+    0 0 22px rgba(255, 79, 179, 0.18);
 }
 
 .main-nav a::after {
@@ -267,7 +300,8 @@ body.panel-document:not(.is-premium) .panel-page {
 }
 
 body.panel-document .main-nav a.premium-only,
-.main-nav a[href="painel.html"].is-active {
+.main-nav a[href="painel.html"].is-active,
+.main-nav a[href="/painel"].is-active {
   color: #ffe9a8;
   background: rgba(255, 211, 111, 0.17);
   box-shadow:
@@ -276,7 +310,8 @@ body.panel-document .main-nav a.premium-only,
 }
 
 body.panel-document .main-nav a.premium-only::after,
-.main-nav a[href="painel.html"].is-active::after {
+.main-nav a[href="painel.html"].is-active::after,
+.main-nav a[href="/painel"].is-active::after {
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.36), transparent 34%),
     linear-gradient(135deg, rgba(255, 211, 111, 0.62), rgba(255, 79, 179, 0.16));
@@ -2759,6 +2794,15 @@ select:focus {
     padding: 7px 2px;
     text-align: center;
     line-height: 1.08;
+    gap: 3px;
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+    border-radius: 6px;
+    font-size: 0.58rem;
   }
 
   .main-nav a[href="#painel"],
