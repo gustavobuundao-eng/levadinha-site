@@ -250,7 +250,23 @@ async function handleApi(req, res, pathname) {
 }
 
 function serveStatic(req, res, pathname) {
-  const safePath = pathname === "/" ? "/index.html" : pathname;
+  const cleanPath = pathname.replace(/\/+$/, "") || "/";
+  const routeMap = {
+    "/": "/index.html",
+    "/inicio": "/index.html",
+    "/pagina-principal": "/index.html",
+    "/index": "/index.html",
+    "/galeria": "/galeria.html",
+    "/denuncias": "/galeria.html",
+    "/conta": "/conta.html",
+    "/login": "/login.html",
+    "/painel": "/painel.html"
+  };
+  if (cleanPath === "/index.html") {
+    res.writeHead(301, { Location: "/pagina-principal" });
+    return res.end();
+  }
+  const safePath = routeMap[cleanPath] || pathname;
   const filePath = path.resolve(publicDir, `.${safePath}`);
   if (!filePath.startsWith(`${publicDir}${path.sep}`) && filePath !== publicDir) {
     res.writeHead(403);

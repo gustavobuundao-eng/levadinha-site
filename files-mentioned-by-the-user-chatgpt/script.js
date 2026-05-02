@@ -299,7 +299,7 @@ function initActiveNav() {
   const allLinks = Array.from(document.querySelectorAll(".main-nav a"));
   const navLinks = allLinks.filter((link) => (link.getAttribute("href") || "").startsWith("#"));
 
-  const galleryLink = allLinks.find((link) => link.getAttribute("href") === "galeria.html");
+  const galleryLink = allLinks.find((link) => ["/galeria", "galeria.html"].includes(link.getAttribute("href")));
   const isGalleryPage = document.body.classList.contains("gallery-document");
   if (!navLinks.length) {
     if (isGalleryPage && !window.location.hash && galleryLink) setNavActive(galleryLink);
@@ -573,7 +573,7 @@ function guardProtectedPages() {
   if (document.body.classList.contains("panel-document") && !isPremiumUser()) {
     showToast("Entre na conta premium para acessar o painel.");
     window.setTimeout(() => {
-      window.location.href = "conta.html";
+      window.location.href = "/conta";
     }, 450);
   }
 }
@@ -1014,7 +1014,7 @@ function setCurrentUser(userId) {
   }
   updateAccessState();
   if (document.body.classList.contains("auth-document")) {
-    const destination = isPremiumUser() ? "painel.html" : "conta.html";
+    const destination = isPremiumUser() ? "/painel" : "/conta";
     window.setTimeout(() => {
       window.location.href = destination;
     }, 350);
@@ -1254,7 +1254,7 @@ function initDeveloperMode() {
   if (!document.querySelector(".developer-toolbar")) {
     const toolbar = document.createElement("div");
     toolbar.className = "developer-toolbar";
-    const exitUrl = `${window.location.pathname.split("/").pop() || "index.html"}${window.location.hash || ""}`;
+    const exitUrl = `${window.location.pathname || "/pagina-principal"}${window.location.hash || ""}`;
     toolbar.innerHTML = `
       <div class="dev-toolbar-topbar">
         <strong>Modo desenvolvedor</strong>
@@ -1875,7 +1875,7 @@ function renderAccountSummary() {
         <span class="slot-mark">Conta</span>
         <h3>Nenhuma conta conectada</h3>
         <p>Entre ou crie uma conta para ver suas informacoes.</p>
-        <a class="button primary" href="conta.html">Ir para conta</a>
+        <a class="button primary" href="/conta">Ir para conta</a>
       </div>
     `;
     return;
@@ -1952,7 +1952,7 @@ function renderAccountSummary() {
       ` : ""}
       <div class="account-actions">
         ${editing ? "" : `<button class="button primary" type="button" data-profile-action="edit">Editar perfil</button>`}
-        ${premium ? `<a class="button primary golden-button" href="painel.html">Abrir painel premium</a>` : `<a class="button ghost" href="index.html#bo">Registrar B.O.</a>`}
+        ${premium ? `<a class="button primary golden-button" href="/painel">Abrir painel premium</a>` : `<a class="button ghost" href="/pagina-principal#bo">Registrar B.O.</a>`}
         <button id="logoutButtonInline" class="button ghost" type="button">Sair da conta</button>
       </div>
     </article>

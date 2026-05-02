@@ -8,6 +8,8 @@
       name="description"
       content="Galeria reservada para prints, momentos do gabinete e imagens do jogo da Levadinha."
     />
+    <link rel="icon" type="image/png" href="assets/levadinha-personagem.png" />
+    <link rel="apple-touch-icon" href="assets/levadinha-personagem.png" />
     <link rel="preload" href="assets/levadinha-logo-novo.png" as="image" />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -16,22 +18,22 @@
     <div class="sparkle-layer" aria-hidden="true"></div>
 
     <header class="site-header">
-      <a class="brand" href="index.html" aria-label="Voltar para o inicio">
+      <a class="brand" href="/pagina-principal" aria-label="Voltar para o inicio">
         <img src="assets/levadinha-logo-novo.png" alt="Levadinha" decoding="async" />
       </a>
       <nav class="main-nav" aria-label="Navegacao principal">
-        <a href="index.html">Inicio</a>
-        <a href="index.html#sobre">Sobre</a>
-        <a class="is-active" href="galeria.html">Galeria</a>
+        <a href="/pagina-principal">Inicio</a>
+        <a href="/pagina-principal#sobre">Sobre</a>
+        <a class="is-active" href="/galeria">Galeria</a>
         <a href="#denuncias">Denuncias</a>
-        <a href="index.html#clientes">Clientes</a>
-        <a href="conta.html">Conta</a>
-        <a class="premium-only" href="painel.html">Painel</a>
+        <a href="/pagina-principal#clientes">Clientes</a>
+        <a href="/conta">Conta</a>
+        <a class="premium-only" href="/painel">Painel</a>
       </nav>
       <div class="header-actions">
-        <a class="developer-link premium-only" href="galeria.html?dev=1">Modo desenvolvedor</a>
+        <a class="developer-link premium-only" href="/galeria?dev=1">Modo desenvolvedor</a>
         <span class="header-status">Gabinete online</span>
-        <a class="nav-cta" href="index.html#bo">Abrir caso</a>
+        <a class="nav-cta" href="/pagina-principal#bo">Abrir caso</a>
       </div>
     </header>
 
@@ -196,7 +198,7 @@
 
     <footer class="site-footer">
       <p>Levadinha Advocacia Habbo</p>
-      <a href="index.html">Voltar para o inicio</a>
+      <a href="/pagina-principal">Voltar para o inicio</a>
     </footer>
 
     <script src="src/services/storage.js"></script>
