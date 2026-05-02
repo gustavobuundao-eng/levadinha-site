@@ -1347,6 +1347,19 @@ function initDeveloperMode() {
       <label><input id="devAnimatedGradient" type="checkbox" /> gradiente animado</label>
       <label class="dev-image-field">Imagem <input id="devImageSrc" type="text" placeholder="assets/imagem.png" /></label>
       <label class="dev-upload-field">Enviar imagem <input id="devImageUpload" type="file" accept="image/*" /></label>
+      <div id="devGalleryTools" class="dev-gallery-tools">
+        <strong>Galeria</strong>
+        <label>Area
+          <select id="devGalleryTarget">
+            <option value="galleryFeatureImage">Imagem principal</option>
+            <option value="gallerySlot01Image">Slot 01</option>
+            <option value="gallerySlot02Image">Slot 02</option>
+            <option value="gallerySlot03Image">Slot 03</option>
+          </select>
+        </label>
+        <label>Enviar do PC <input id="devGalleryUpload" type="file" accept="image/*" /></label>
+        <button id="devGalleryClear" class="button ghost" type="button">Limpar imagem</button>
+      </div>
       <button id="devSave" class="button primary" type="button">Salvar</button>
       <a class="button ghost" href="${exitUrl}">Sair</a>
     `;
@@ -1359,6 +1372,8 @@ function initDeveloperMode() {
   document.getElementById("devResetSession")?.addEventListener("click", resetDeveloperSession);
   document.getElementById("devClearSelected")?.addEventListener("click", clearSelectedDeveloperElement);
   document.getElementById("devImageUpload")?.addEventListener("change", handleDeveloperImageUpload);
+  document.getElementById("devGalleryUpload")?.addEventListener("change", handleGalleryToolUpload);
+  document.getElementById("devGalleryClear")?.addEventListener("click", clearGalleryToolImage);
   document.querySelector(".dev-toolbar-topbar")?.addEventListener("pointerdown", startToolbarDrag);
   ["devFontSize", "devWidth", "devHeight", "devRadius", "devPadding", "devOpacity", "devBorderWidth", "devBorderStyle", "devTextColor", "devBgColor", "devBgImage", "devShadow", "devDepth", "devHeaderHeight", "devGravity", "devAnimatedGradient", "devImageSrc"].forEach((id) => {
     document.getElementById(id)?.addEventListener("input", applyDeveloperControls);
@@ -1601,6 +1616,7 @@ function syncDeveloperToolbar(element) {
 function applyDeveloperControls() {
   if (!selectedDevElement) return;
   queueDeveloperHistory(selectedDevElement);
+  const isGalleryImage = selectedDevElement.classList.contains("gallery-upload-image");
 
   const size = document.getElementById("devFontSize")?.value;
   const width = document.getElementById("devWidth")?.value;
@@ -1637,13 +1653,13 @@ function applyDeveloperControls() {
     selectedDevElement.style.backgroundImage = `linear-gradient(135deg, ${bg || "#171019"}, rgba(255, 79, 179, 0.42), rgba(255, 211, 111, 0.28), ${bg || "#171019"})`;
     selectedDevElement.style.backgroundSize = "240% 240%";
   }
-  if (width) selectedDevElement.style.width = `${width}px`;
-  if (height && !selectedDevElement.dataset.editKey) selectedDevElement.style.minHeight = `${height}px`;
+  if (width && !isGalleryImage) selectedDevElement.style.width = `${width}px`;
+  if (height && !selectedDevElement.dataset.editKey && !isGalleryImage) selectedDevElement.style.minHeight = `${height}px`;
   if (radius && selectedDevElement.tagName !== "IMG") selectedDevElement.style.borderRadius = `${radius}px`;
   if (padding && !selectedDevElement.dataset.editKey && selectedDevElement.tagName !== "IMG") selectedDevElement.style.padding = `${padding}px`;
   if (opacity) selectedDevElement.style.opacity = String(Number(opacity) / 100);
-  if (borderWidth) selectedDevElement.style.borderWidth = `${borderWidth}px`;
-  if (borderStyle) selectedDevElement.style.borderStyle = borderStyle;
+  if (borderWidth && !isGalleryImage) selectedDevElement.style.borderWidth = `${borderWidth}px`;
+  if (borderStyle && !isGalleryImage) selectedDevElement.style.borderStyle = borderStyle;
   if (shadow && Number(shadow) > 0) {
     selectedDevElement.style.boxShadow = `0 ${Math.round(Number(shadow) / 2)}px ${shadow}px rgba(0, 0, 0, 0.34), 0 0 ${Math.round(Number(shadow) / 2)}px rgba(255, 79, 179, 0.14)`;
   } else {
@@ -1661,7 +1677,7 @@ function applyDeveloperControls() {
   if (headerHeight && selectedDevElement.closest(".site-header")) {
     document.querySelector(".site-header")?.style.setProperty("min-height", `${headerHeight}px`);
   }
-  selectedDevElement.style.maxWidth = "100%";
+  if (!isGalleryImage) selectedDevElement.style.maxWidth = "100%";
   if (image) {
     const imageTarget = selectedDevElement.tagName === "IMG"
       ? selectedDevElement
@@ -1716,6 +1732,40 @@ async function handleDeveloperImageUpload(event) {
   } finally {
     event.target.value = "";
   }
+}
+
+async function handleGalleryToolUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const key = document.getElementById("devGalleryTarget")?.value || "galleryFeatureImage";
+  const imageTarget = document.querySelector(`[data-gallery-key="${key}"]`);
+  if (!imageTarget) {
+    showToast("Nao encontrei esse slot da galeria.");
+    event.target.value = "";
+    return;
+  }
+
+  selectedDevElement = imageTarget;
+  document.querySelectorAll(".dev-selected").forEach((item) => item.classList.remove("dev-selected"));
+  imageTarget.classList.add("dev-selected");
+  await handleDeveloperImageUpload({ target: event.target });
+}
+
+async function clearGalleryToolImage() {
+  const key = document.getElementById("devGalleryTarget")?.value || "galleryFeatureImage";
+  const imageTarget = document.querySelector(`[data-gallery-key="${key}"]`);
+  if (!imageTarget) return;
+
+  pushDeveloperHistory(imageTarget);
+  imageTarget.removeAttribute("src");
+  delete state.customContent[key];
+  if (imageTarget.dataset.devKey) delete state.customContent[imageTarget.dataset.devKey];
+  selectedDevElement = imageTarget;
+  persistDeveloperElement(imageTarget);
+  saveCustomContent();
+  await saveRemoteSiteSettings();
+  syncDeveloperToolbar(imageTarget);
+  showToast("Imagem da galeria removida.");
 }
 
 async function uploadImageToCloudinary(file) {
