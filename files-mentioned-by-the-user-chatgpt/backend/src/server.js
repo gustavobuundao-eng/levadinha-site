@@ -1,6 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
+const zlib = require("node:zlib");
 const { port, publicDir } = require("./config");
 const {
   now,
@@ -250,29 +251,69 @@ async function handleApi(req, res, pathname) {
 
 function serveStatic(req, res, pathname) {
   const safePath = pathname === "/" ? "/index.html" : pathname;
-  const filePath = path.normalize(path.join(publicDir, safePath));
-  if (!filePath.startsWith(publicDir)) {
+  const filePath = path.resolve(publicDir, `.${safePath}`);
+  if (!filePath.startsWith(`${publicDir}${path.sep}`) && filePath !== publicDir) {
     res.writeHead(403);
     return res.end("Forbidden");
   }
   fs.readFile(filePath, (error, data) => {
     if (error) {
+      const wantsHtml = req.headers.accept?.includes("text/html") || path.extname(filePath) === ".html" || !path.extname(filePath);
+      const fallbackPath = path.join(publicDir, "index.html");
+      if (wantsHtml && filePath !== fallbackPath && fs.existsSync(fallbackPath)) {
+        return fs.readFile(fallbackPath, (fallbackError, fallbackData) => {
+          if (fallbackError) {
+            res.writeHead(404);
+            return res.end("Not found");
+          }
+          return sendStaticData(req, res, fallbackPath, fallbackData);
+        });
+      }
       res.writeHead(404);
       return res.end("Not found");
     }
-    const ext = path.extname(filePath);
-    const type = {
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css; charset=utf-8",
-      ".js": "text/javascript; charset=utf-8",
-      ".png": "image/png",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".webp": "image/webp"
-    }[ext] || "application/octet-stream";
-    res.writeHead(200, { "Content-Type": type });
-    res.end(data);
+    return sendStaticData(req, res, filePath, data);
   });
+}
+
+function sendStaticData(req, res, filePath, data) {
+  const ext = path.extname(filePath);
+  const type = {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon",
+    ".svg": "image/svg+xml; charset=utf-8"
+  }[ext] || "application/octet-stream";
+  const cacheControl = ext === ".html"
+    ? "no-cache"
+    : [".css", ".js"].includes(ext)
+      ? "public, max-age=300"
+      : "public, max-age=604800, immutable";
+  const headers = {
+    "Content-Type": type,
+    "Cache-Control": cacheControl,
+    "Vary": "Accept-Encoding"
+  };
+  const acceptsGzip = /\bgzip\b/.test(req.headers["accept-encoding"] || "");
+  const canCompress = [".html", ".css", ".js", ".json", ".svg"].includes(ext);
+  if (acceptsGzip && canCompress && data.length > 1024) {
+    zlib.gzip(data, { level: 6 }, (zipError, zipped) => {
+      if (zipError) {
+        res.writeHead(200, headers);
+        return res.end(data);
+      }
+      res.writeHead(200, { ...headers, "Content-Encoding": "gzip" });
+      return res.end(zipped);
+    });
+    return;
+  }
+  res.writeHead(200, headers);
+  return res.end(data);
 }
 
 const server = http.createServer(async (req, res) => {
@@ -289,4 +330,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, () => {
   console.log(`Levadinha backend rodando em http://localhost:${port}`);
+  console.log(`Arquivos publicos em ${publicDir}`);
 });

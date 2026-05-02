@@ -386,7 +386,7 @@ body.panel-document .main-nav a.premium-only::after,
 }
 
 main {
-  overflow: hidden;
+  overflow: clip;
 }
 
 .hero-section,
@@ -441,9 +441,10 @@ main {
   margin: 0;
   max-width: 700px;
   font-size: var(--hero-title-size);
-  line-height: 0.96;
+  line-height: 1.08;
   letter-spacing: 0;
   overflow-wrap: break-word;
+  padding-bottom: 0.08em;
 }
 
 .hero-copy h1,
@@ -875,8 +876,9 @@ main {
 .section-heading h2 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3.35rem);
-  line-height: 1.04;
+  line-height: 1.1;
   letter-spacing: 0;
+  padding-bottom: 0.06em;
 }
 
 .word-hover-title span {
@@ -928,8 +930,9 @@ main {
 .gallery-page-head h1 {
   margin: 0;
   font-size: clamp(2.3rem, 5.6vw, 5rem);
-  line-height: 0.98;
+  line-height: 1.08;
   letter-spacing: 0;
+  padding-bottom: 0.08em;
 }
 
 .gallery-page-head > p {
@@ -1459,7 +1462,8 @@ main {
 .panel-page .section-heading h1 {
   margin: 0;
   font-size: clamp(2.2rem, 5vw, 4.5rem);
-  line-height: 1;
+  line-height: 1.08;
+  padding-bottom: 0.08em;
 }
 
 .auth-page-panel {
