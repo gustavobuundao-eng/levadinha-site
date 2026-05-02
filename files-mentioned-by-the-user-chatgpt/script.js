@@ -7,12 +7,15 @@ const STORAGE_KEYS = {
   effects: "levadinha.effects",
   users: "levadinha.users",
   session: "levadinha.session",
+  apiToken: "levadinha.apiToken",
   customContent: "levadinha.customContent"
 };
 
 const ADMIN_PASSWORD = "levadinha";
 const PREMIUM_USER_ID = "levadinha";
 const PREMIUM_DEFAULT_PASSWORD = "levadinha";
+const CLOUDINARY_CLOUD_NAME = "dxdmuvrqe";
+const CLOUDINARY_UPLOAD_PRESET = "levadinha_gallery";
 
 if (!window.location.hash) {
   window.scrollTo(0, 0);
@@ -90,13 +93,14 @@ const devEditor = {
 
 init();
 
-function init() {
+async function init() {
   window.history.scrollRestoration = "manual";
   registerVisit();
-  seedIfEmpty();
+  removeDemoClients();
   seedPremiumUser();
   assignDeveloperKeys();
   repairUnsafeDeveloperCustomizations();
+  await loadRemoteSiteSettings();
   applyCustomContent();
   guardProtectedPages();
   renderAll();
@@ -195,7 +199,7 @@ function getAnchorOffset(target) {
   const header = document.querySelector(".site-header");
   const headerIsSticky = header && getComputedStyle(header).position === "sticky";
   const headerHeight = headerIsSticky ? header.getBoundingClientRect().height : 0;
-  const extraSpace = target?.id === "bo" ? 34 : 44;
+  const extraSpace = target?.id === "bo" ? 18 : 8;
   return headerHeight + extraSpace;
 }
 
@@ -322,8 +326,8 @@ function initActiveNav() {
 
     const header = document.querySelector(".site-header");
     const headerOffset = header && getComputedStyle(header).position === "sticky"
-      ? header.getBoundingClientRect().height + 72
-      : 72;
+      ? header.getBoundingClientRect().height + 12
+      : 12;
     const marker = window.scrollY + headerOffset;
     let current = sections[0];
 
@@ -332,8 +336,13 @@ function initActiveNav() {
       return;
     }
 
+    const firstSection = sections[0]?.section;
+    if (!isGalleryPage && firstSection && marker < firstSection.offsetTop) {
+      clearNavActive();
+      return;
+    }
+
     if (isGalleryPage && galleryLink) {
-      const firstSection = sections[0]?.section;
       if (!firstSection || marker < firstSection.offsetTop) {
         setNavActive(galleryLink);
         return;
@@ -485,31 +494,15 @@ function registerVisit() {
   localStorage.setItem(STORAGE_KEYS.visits, String(visits));
 }
 
-function seedIfEmpty() {
-  if (state.clients.length) return;
+function removeDemoClients() {
+  const before = state.clients.length;
+  state.clients = state.clients.filter((client) => {
+    const id = String(client.userId || "");
+    const nick = String(client.nick || "").toLowerCase();
+    return !id.startsWith("seed-") && !["cliente.rosa", "pixeljusto"].includes(nick);
+  });
 
-  state.clients = [
-    {
-      id: makeId(),
-      userId: "seed-cliente-rosa",
-      createdAt: new Date().toISOString(),
-      nick: "Cliente.Rosa",
-      role: "Empresaria",
-      status: "Em analise",
-      bio: "Busca orientacao para registrar uma quebra de acordo comercial."
-    },
-    {
-      id: makeId(),
-      userId: "seed-pixeljusto",
-      createdAt: new Date().toISOString(),
-      nick: "PixelJusto",
-      role: "Jogador",
-      status: "Orientado",
-      bio: "Perfil publico liberado para acompanhamento do caso."
-    }
-  ];
-
-  saveClients();
+  if (state.clients.length !== before) saveClients();
 }
 
 function seedPremiumUser() {
@@ -977,7 +970,7 @@ function registerUser(username, password) {
   showToast("Conta criada. Agora faca login.");
 }
 
-function loginUser(username, password) {
+async function loginUser(username, password) {
   const id = normalizeUserId(username);
   const user = state.users.find((item) => item.id === id && item.password === password);
 
@@ -986,15 +979,39 @@ function loginUser(username, password) {
     return;
   }
 
+  await loginRemoteIfPossible(username, password);
   setCurrentUser(user.id);
   elements.authForm?.reset();
   showToast("Conta conectada.");
+}
+
+async function loginRemoteIfPossible(username, password) {
+  try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!data.token) return;
+    const storage = document.querySelector('[name="rememberDevice"]')?.checked ? localStorage : sessionStorage;
+    storage.setItem(STORAGE_KEYS.apiToken, data.token);
+  } catch {
+    // Local mode keeps working even when the API is not available.
+  }
+}
+
+function getApiToken() {
+  return localStorage.getItem(STORAGE_KEYS.apiToken) || sessionStorage.getItem(STORAGE_KEYS.apiToken) || "";
 }
 
 function logoutUser() {
   state.currentUser = "";
   localStorage.removeItem(STORAGE_KEYS.session);
   sessionStorage.removeItem(STORAGE_KEYS.session);
+  localStorage.removeItem(STORAGE_KEYS.apiToken);
+  sessionStorage.removeItem(STORAGE_KEYS.apiToken);
   updateAccessState();
   showToast("Voce saiu da conta.");
 }
@@ -1191,6 +1208,46 @@ function handleSiteEditorSubmit(event) {
   showToast("Personalizacao premium salva.");
 }
 
+async function loadRemoteSiteSettings() {
+  try {
+    const response = await fetch("/api/site/settings", { headers: { Accept: "application/json" } });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!data.settings || typeof data.settings !== "object") return;
+    state.customContent = { ...state.customContent, ...data.settings };
+    saveCustomContent({ remote: false });
+  } catch {
+    // Local file preview and offline editing keep using localStorage.
+  }
+}
+
+async function saveRemoteSiteSettings() {
+  if (!isPremiumUser()) return false;
+  let token = getApiToken();
+  if (!token) {
+    const user = getCurrentUser();
+    if (user?.username && user?.password) {
+      await loginRemoteIfPossible(user.username, user.password);
+      token = getApiToken();
+    }
+  }
+  if (!token) return false;
+
+  try {
+    const response = await fetch("/api/admin/site/settings", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ settings: state.customContent })
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 function applyCustomContent() {
   Object.entries(state.customContent || {}).forEach(([key, value]) => {
     if (!value) return;
@@ -1225,6 +1282,11 @@ function applyCustomContent() {
       image.src = state.customContent.officeImageSrc;
     });
   }
+
+  document.querySelectorAll("[data-gallery-key]").forEach((image) => {
+    const src = state.customContent[image.dataset.galleryKey];
+    if (src) image.src = src;
+  });
 
   const root = document.documentElement;
   const styleMap = {
@@ -1284,6 +1346,7 @@ function initDeveloperMode() {
       <label><input id="devGravity" type="checkbox" /> gravidade 3D</label>
       <label><input id="devAnimatedGradient" type="checkbox" /> gradiente animado</label>
       <label class="dev-image-field">Imagem <input id="devImageSrc" type="text" placeholder="assets/imagem.png" /></label>
+      <label class="dev-upload-field">Enviar imagem <input id="devImageUpload" type="file" accept="image/*" /></label>
       <button id="devSave" class="button primary" type="button">Salvar</button>
       <a class="button ghost" href="${exitUrl}">Sair</a>
     `;
@@ -1295,6 +1358,7 @@ function initDeveloperMode() {
   document.getElementById("devRedo")?.addEventListener("click", redoDeveloperAction);
   document.getElementById("devResetSession")?.addEventListener("click", resetDeveloperSession);
   document.getElementById("devClearSelected")?.addEventListener("click", clearSelectedDeveloperElement);
+  document.getElementById("devImageUpload")?.addEventListener("change", handleDeveloperImageUpload);
   document.querySelector(".dev-toolbar-topbar")?.addEventListener("pointerdown", startToolbarDrag);
   ["devFontSize", "devWidth", "devHeight", "devRadius", "devPadding", "devOpacity", "devBorderWidth", "devBorderStyle", "devTextColor", "devBgColor", "devBgImage", "devShadow", "devDepth", "devHeaderHeight", "devGravity", "devAnimatedGradient", "devImageSrc"].forEach((id) => {
     document.getElementById(id)?.addEventListener("input", applyDeveloperControls);
@@ -1498,6 +1562,7 @@ function syncDeveloperToolbar(element) {
   const gravity = document.getElementById("devGravity");
   const gradient = document.getElementById("devAnimatedGradient");
   const image = document.getElementById("devImageSrc");
+  const upload = document.getElementById("devImageUpload");
 
   if (name) name.textContent = element.dataset.editKey || element.alt || element.id || element.tagName.toLowerCase();
   if (size) size.value = Math.min(110, Math.max(10, parseFloat(styles.fontSize) || 24));
@@ -1522,8 +1587,14 @@ function syncDeveloperToolbar(element) {
   if (gravity) gravity.checked = element.classList.contains("dev-gravity") || Boolean(element.dataset.devDepth);
   if (gradient) gradient.checked = element.classList.contains("dev-animated-gradient");
   if (image) {
-    image.value = element.tagName === "IMG" ? element.getAttribute("src") || "" : "";
-    image.closest("label").hidden = element.tagName !== "IMG";
+    const childImage = element.querySelector?.("[data-gallery-key]");
+    const canUseImage = element.tagName === "IMG" || Boolean(element.dataset.galleryKey) || Boolean(childImage);
+    image.value = element.tagName === "IMG" ? element.getAttribute("src") || "" : childImage?.getAttribute("src") || "";
+    image.closest("label").hidden = !canUseImage;
+  }
+  if (upload) {
+    upload.value = "";
+    upload.closest("label").hidden = !(element.tagName === "IMG" || element.dataset.galleryKey || element.querySelector?.("[data-gallery-key]"));
   }
 }
 
@@ -1591,7 +1662,77 @@ function applyDeveloperControls() {
     document.querySelector(".site-header")?.style.setProperty("min-height", `${headerHeight}px`);
   }
   selectedDevElement.style.maxWidth = "100%";
-  if (selectedDevElement.tagName === "IMG" && image) selectedDevElement.src = image;
+  if (image) {
+    const imageTarget = selectedDevElement.tagName === "IMG"
+      ? selectedDevElement
+      : selectedDevElement.querySelector?.("[data-gallery-key]");
+    if (imageTarget) {
+      imageTarget.src = image;
+      if (imageTarget.dataset.galleryKey) state.customContent[imageTarget.dataset.galleryKey] = image;
+    }
+  }
+}
+
+async function handleDeveloperImageUpload(event) {
+  const file = event.target.files?.[0];
+  if (!file || !selectedDevElement) return;
+  if (!file.type.startsWith("image/")) {
+    showToast("Escolha um arquivo de imagem.");
+    return;
+  }
+
+  if (!isPremiumUser()) {
+    showToast("Apenas a conta premium pode enviar imagens da galeria.");
+    return;
+  }
+
+  const imageTarget = selectedDevElement.tagName === "IMG"
+    ? selectedDevElement
+    : selectedDevElement.querySelector?.("[data-gallery-key]");
+
+  if (!imageTarget) {
+    showToast("Selecione uma imagem ou card da galeria.");
+    return;
+  }
+
+  pushDeveloperHistory(imageTarget);
+  showToast("Enviando imagem para o Cloudinary...");
+
+  try {
+    const secureUrl = await uploadImageToCloudinary(file);
+    imageTarget.src = secureUrl;
+    if (imageTarget.dataset.galleryKey) state.customContent[imageTarget.dataset.galleryKey] = secureUrl;
+    if (imageTarget.dataset.devKey) state.customContent[imageTarget.dataset.devKey] = secureUrl;
+    selectedDevElement = imageTarget;
+    syncDeveloperToolbar(imageTarget);
+    persistDeveloperElement(imageTarget);
+    saveCustomContent();
+    const remoteSaved = await saveRemoteSiteSettings();
+    showToast(remoteSaved
+      ? "Imagem salva. Todo mundo vai ver depois do carregamento."
+      : "Imagem salva neste navegador. Entre na conta premium para salvar para todos.");
+  } catch (error) {
+    showToast(error.message || "Nao consegui enviar a imagem.");
+  } finally {
+    event.target.value = "";
+  }
+}
+
+async function uploadImageToCloudinary(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  formData.append("folder", "levadinha/galeria");
+
+  const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    method: "POST",
+    body: formData
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.secure_url) {
+    throw new Error(data.error?.message || "Upload recusado pelo Cloudinary.");
+  }
+  return data.secure_url;
 }
 
 function persistDeveloperElement(element) {
@@ -1608,6 +1749,7 @@ function persistDeveloperElement(element) {
     if (isDirectTextEditable(element)) state.customContent[element.dataset.devKey] = element.textContent.trim();
     if (element.tagName === "IMG") state.customContent[element.dataset.devKey] = element.getAttribute("src") || "";
   }
+  if (element.dataset.galleryKey) state.customContent[element.dataset.galleryKey] = element.getAttribute("src") || "";
 }
 
 function clearSelectedDeveloperElement() {
@@ -1626,9 +1768,14 @@ function clearSelectedDeveloperElement() {
   if (key) {
     delete state.customContent[`${key}Style`];
     delete state.customContent[`${key}Classes`];
+    delete state.customContent[key];
   }
   if (editKey) {
     delete state.customContent[`${editKey}Style`];
+  }
+  if (selectedDevElement.dataset.galleryKey) {
+    delete state.customContent[selectedDevElement.dataset.galleryKey];
+    selectedDevElement.removeAttribute("src");
   }
 
   saveCustomContent();
@@ -2113,7 +2260,10 @@ function renderClients() {
   });
 
   if (!clients.length) {
-    elements.clientDirectory.innerHTML = `<div class="empty-state">Nenhum perfil publico encontrado.</div>`;
+    const message = term
+      ? "Nenhum perfil publico encontrado para essa busca."
+      : "Ainda nao ha perfis publicos cadastrados. Quando uma pessoa real criar o perfil dela, ele vai aparecer aqui.";
+    elements.clientDirectory.innerHTML = `<div class="empty-state">${message}</div>`;
     if (elements.clientPagination) elements.clientPagination.innerHTML = "";
     return;
   }
@@ -2502,8 +2652,9 @@ function savePosts() {
   writeJson(STORAGE_KEYS.posts, state.posts);
 }
 
-function saveCustomContent() {
+function saveCustomContent(options = {}) {
   writeJson(STORAGE_KEYS.customContent, state.customContent);
+  if (options.remote !== false) saveRemoteSiteSettings();
 }
 
 function saveUsers() {

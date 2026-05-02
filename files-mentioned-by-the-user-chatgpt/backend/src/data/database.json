@@ -4,7 +4,7 @@
       "id": "levadinha",
       "accountNumber": "0001",
       "username": "Levadinha",
-      "passwordHash": "d1378b4f7d13d5e06695a51e0082c62d:78dabcfb11d7a6eb0628362053e242134d6b911e1c7ba785ecd1b8b259b8df5f",
+      "passwordHash": "a5966a291a5fad56d788aac62265d005:4d090aa626a6967df0beefbab31b45f9b25fafc2fb1512947a46752d40f3c2c1",
       "role": "premium",
       "accountType": "Conta premium",
       "bio": "Conta premium da Levadinha.",
@@ -17,5 +17,10 @@
   "cases": [],
   "denunciations": [],
   "posts": [],
-  "settings": {}
+  "settings": {
+    "site": {
+      "galleryFeatureImage": "https://example.com/test.png"
+    },
+    "updatedAt": "2026-05-02T21:49:15.699Z"
+  }
 }

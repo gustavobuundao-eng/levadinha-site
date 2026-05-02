@@ -161,6 +161,24 @@ async function handleApi(req, res, pathname) {
     return send(res, 200, { users: db.users.map(publicUser) });
   }
 
+  params = route(req.method, pathname, { method: "GET", regex: /^\/api\/site\/settings$/ });
+  if (params) {
+    const db = readDb();
+    return send(res, 200, { settings: db.settings?.site || {} });
+  }
+
+  params = route(req.method, pathname, { method: "PATCH", regex: /^\/api\/admin\/site\/settings$/ });
+  if (params) {
+    if (!requirePremium(req, res)) return;
+    const body = await readBody(req);
+    const db = readDb();
+    db.settings = db.settings || {};
+    db.settings.site = { ...(db.settings.site || {}), ...(body.settings || {}) };
+    db.settings.updatedAt = now();
+    writeDb(db);
+    return send(res, 200, { settings: db.settings.site });
+  }
+
   params = route(req.method, pathname, { method: "POST", regex: /^\/api\/cases$/ });
   if (params) {
     const user = requireAuth(req, res);
