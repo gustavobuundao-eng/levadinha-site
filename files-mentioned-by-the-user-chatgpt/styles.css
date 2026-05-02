@@ -254,6 +254,16 @@ body.panel-document:not(.is-premium) .panel-page {
   box-shadow: 0 0 14px rgba(255, 79, 179, 0.14);
 }
 
+.nav-icon:empty::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: currentColor;
+  opacity: 0.76;
+  box-shadow: 0 0 10px currentColor;
+}
+
 .main-nav a:hover .nav-icon,
 .main-nav a:focus-visible .nav-icon,
 .main-nav a.is-active .nav-icon {
@@ -998,14 +1008,14 @@ main {
 
 .gallery-upload-image {
   position: absolute !important;
-  inset: 0;
+  inset: 0 !important;
   z-index: 0;
   width: 100% !important;
   height: 100% !important;
   min-height: 100% !important;
   display: none;
-  object-fit: cover;
-  object-position: center;
+  object-fit: cover !important;
+  object-position: center !important;
   opacity: 0.78;
   filter: saturate(1.08) contrast(1.04);
   max-width: none !important;
@@ -1972,6 +1982,13 @@ body.developer-mode [data-dev-key] {
 
 body.developer-mode .gallery-upload-image[data-dev-key] {
   position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 body.developer-mode .gallery-upload-image.dev-selected {

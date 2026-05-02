@@ -101,6 +101,7 @@ async function init() {
   assignDeveloperKeys();
   repairUnsafeDeveloperCustomizations();
   await loadRemoteSiteSettings();
+  repairUnsafeDeveloperCustomizations();
   applyCustomContent();
   guardProtectedPages();
   renderAll();
@@ -1285,6 +1286,7 @@ function applyCustomContent() {
 
   document.querySelectorAll("[data-gallery-key]").forEach((image) => {
     const src = state.customContent[image.dataset.galleryKey];
+    normalizeGalleryImageElement(image);
     if (src) image.src = src;
   });
 
@@ -1491,15 +1493,19 @@ function isTextLikeElement(element) {
 }
 
 function isDirectTextEditable(element) {
+  if (element.classList?.contains("nav-icon")) return false;
   if (!isTextLikeElement(element)) return false;
   return !element.querySelector("input, textarea, select, button, img, a, form");
 }
 
 function canApplyStoredDeveloperContent(element) {
+  if (element.classList?.contains("nav-icon")) return false;
   return !element.matches("label") && !element.closest(".account-profile-form");
 }
 
 function canApplyStoredDeveloperStyle(element) {
+  if (element.classList?.contains("nav-icon")) return false;
+  if (element.classList?.contains("gallery-upload-image")) return false;
   if (element.closest("form") && element.matches("label, span, strong, small, p")) return false;
   if (element.closest(".about-character-card figcaption")) return false;
   return true;
@@ -1529,6 +1535,10 @@ function repairUnsafeDeveloperCustomizations() {
         delete state.customContent[`${key}Classes`];
         changed = true;
       }
+    }
+
+    if (element.classList.contains("gallery-upload-image")) {
+      normalizeGalleryImageElement(element);
     }
   });
 
@@ -1687,6 +1697,31 @@ function applyDeveloperControls() {
       if (imageTarget.dataset.galleryKey) state.customContent[imageTarget.dataset.galleryKey] = image;
     }
   }
+  if (isGalleryImage) normalizeGalleryImageElement(selectedDevElement);
+}
+
+function normalizeGalleryImageElement(image) {
+  if (!image?.classList?.contains("gallery-upload-image")) return;
+  image.removeAttribute("style");
+  image.style.removeProperty("position");
+  image.style.removeProperty("left");
+  image.style.removeProperty("top");
+  image.style.removeProperty("right");
+  image.style.removeProperty("bottom");
+  image.style.removeProperty("width");
+  image.style.removeProperty("height");
+  image.style.removeProperty("min-height");
+  image.style.removeProperty("max-width");
+  image.style.removeProperty("padding");
+  image.style.removeProperty("margin");
+  image.style.removeProperty("border-width");
+  image.style.removeProperty("border-style");
+  image.style.removeProperty("box-shadow");
+  image.style.removeProperty("transform");
+  image.style.removeProperty("background");
+  image.style.removeProperty("background-image");
+  image.classList.remove("dev-gravity", "dev-animated-gradient");
+  delete image.dataset.devDepth;
 }
 
 async function handleDeveloperImageUpload(event) {
@@ -1800,6 +1835,10 @@ function persistDeveloperElement(element) {
     if (element.tagName === "IMG") state.customContent[element.dataset.devKey] = element.getAttribute("src") || "";
   }
   if (element.dataset.galleryKey) state.customContent[element.dataset.galleryKey] = element.getAttribute("src") || "";
+  if (element.classList?.contains("gallery-upload-image") && element.dataset.devKey) {
+    delete state.customContent[`${element.dataset.devKey}Style`];
+    delete state.customContent[`${element.dataset.devKey}Classes`];
+  }
 }
 
 function clearSelectedDeveloperElement() {
