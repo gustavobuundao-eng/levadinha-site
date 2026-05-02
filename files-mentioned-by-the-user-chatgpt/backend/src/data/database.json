@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "id": "levadinha",
+      "accountNumber": "0001",
+      "username": "Levadinha",
+      "passwordHash": "af540883b5281510320ab006cdc698ff:e149e4dda64d4dd29ca9426793029c95aae81e049476f19949f0a31258ada7a8",
+      "role": "premium",
+      "accountType": "Conta premium",
+      "bio": "Conta premium da Levadinha.",
+      "avatar": "",
+      "createdAt": "2026-05-02T20:00:46.169Z",
+      "updatedAt": "2026-05-02T20:00:46.171Z"
+    }
+  ],
+  "profiles": [],
+  "cases": [],
+  "denunciations": [],
+  "posts": [],
+  "settings": {}
+}

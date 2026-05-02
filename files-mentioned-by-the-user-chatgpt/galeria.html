@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galeria | Levadinha Advocacia Habbo</title>
+    <meta
+      name="description"
+      content="Galeria reservada para prints, momentos do gabinete e imagens do jogo da Levadinha."
+    />
+    <link rel="preload" href="assets/levadinha-logo-novo.png" as="image" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body id="top" class="gallery-document">
+    <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+    <div class="sparkle-layer" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Voltar para o inicio">
+        <img src="assets/levadinha-logo-novo.png" alt="Levadinha" />
+      </a>
+      <nav class="main-nav" aria-label="Navegacao principal">
+        <a href="index.html">Inicio</a>
+        <a href="index.html#sobre">Sobre</a>
+        <a class="is-active" href="galeria.html">Galeria</a>
+        <a href="#denuncias">Denuncias</a>
+        <a href="index.html#clientes">Clientes</a>
+        <a href="conta.html">Conta</a>
+        <a class="premium-only" href="painel.html">Painel</a>
+      </nav>
+      <div class="header-actions">
+        <a class="developer-link premium-only" href="galeria.html?dev=1">Modo desenvolvedor</a>
+        <span class="header-status">Gabinete online</span>
+        <a class="nav-cta" href="index.html#bo">Abrir caso</a>
+      </div>
+    </header>
+
+    <main class="gallery-page">
+      <section id="galeria" class="gallery-section">
+        <div class="gallery-page-head reveal-on-scroll">
+          <div class="section-heading">
+            <p>Galeria</p>
+            <h1>Momentos do jogo, provas visuais e registros do gabinete.</h1>
+          </div>
+          <p>
+            Este espaco ficou separado para voce adicionar prints do Habbo depois.
+            Por enquanto, deixei os slots prontos e com o mesmo estilo do site.
+          </p>
+        </div>
+
+        <div class="gallery-feature tilt-card reveal-on-scroll">
+          <div>
+            <span class="slot-mark">Destaque</span>
+            <h2>Imagem principal da Levadinha</h2>
+            <p>
+              Aqui pode entrar uma imagem maior do escritorio, uma audiencia,
+              reuniao com cliente ou qualquer cena que voce queira destacar.
+            </p>
+          </div>
+        </div>
+
+        <div class="gallery-slots">
+          <article class="gallery-slot tilt-card">
+            <div class="slot-mark">01</div>
+            <h3>Imagem do atendimento</h3>
+            <p>Slot reservado para um print ou cena importante.</p>
+          </article>
+          <article class="gallery-slot tilt-card">
+            <div class="slot-mark">02</div>
+            <h3>Momento do gabinete</h3>
+            <p>Espaco para mostrar seu escritorio, reuniao ou prova visual.</p>
+          </article>
+          <article class="gallery-slot tilt-card">
+            <div class="slot-mark">03</div>
+            <h3>Registro especial</h3>
+            <p>Outro lugar pronto para uma imagem do jogo.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="denuncias" class="denunciation-section">
+        <div class="section-heading">
+          <p>Denuncias</p>
+          <h2>Mural publico com denuncias aprovadas pela Levadinha.</h2>
+        </div>
+
+        <div class="denunciation-guide">
+          <article class="guide-card tilt-card">
+            <span class="slot-mark">Anonima</span>
+            <h3>Sem revelar nick</h3>
+            <p>Use quando quiser relatar algo sem aparecer publicamente. A Levadinha analisa antes.</p>
+          </article>
+          <article class="guide-card tilt-card">
+            <span class="slot-mark">Publica</span>
+            <h3>Com identificacao</h3>
+            <p>Use quando aceitar mostrar seu nick junto do resumo publicado no mural.</p>
+          </article>
+          <article class="guide-card tilt-card">
+            <span class="slot-mark">Provas</span>
+            <h3>Organize o relato</h3>
+            <p>Informe quem foi citado, onde ocorreu, quando aconteceu e quais prints existem.</p>
+          </article>
+        </div>
+
+        <div class="denunciation-layout">
+          <form id="denunciationForm" class="denunciation-form" autocomplete="off">
+            <h3>Enviar denuncia para analise</h3>
+            <div class="form-grid">
+              <label>
+                Tipo
+                <select name="visibility">
+                  <option value="anonima">Anonima</option>
+                  <option value="publica">Publica</option>
+                </select>
+              </label>
+              <label>
+                Seu nick
+                <input name="author" type="text" placeholder="Opcional se for anonima" />
+              </label>
+              <label>
+                Pessoa denunciada
+                <input name="target" type="text" placeholder="Nick ou grupo citado" required />
+              </label>
+              <label>
+                Categoria
+                <select name="category">
+                  <option>Golpe</option>
+                  <option>Difamacao</option>
+                  <option>Perseguicao</option>
+                  <option>Abuso de cargo</option>
+                  <option>Contrato quebrado</option>
+                  <option>Outro</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Resumo da denuncia
+              <textarea name="summary" rows="4" required placeholder="Explique o que aconteceu de forma objetiva."></textarea>
+            </label>
+            <label>
+              Prints ou observacoes
+              <textarea name="proof" rows="3" placeholder="Descreva quais prints existem ou onde estao guardados."></textarea>
+            </label>
+            <div class="form-footer">
+              <p>A denuncia fica pendente no painel privado e so aparece aqui se for publicada.</p>
+              <button class="button primary" type="submit">Enviar denuncia</button>
+            </div>
+          </form>
+
+          <div>
+            <div class="directory-toolbar">
+              <h3>Denuncias publicadas</h3>
+            </div>
+            <div id="publicDenunciationList" class="denunciation-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mural" class="forum-section">
+        <div class="section-heading">
+          <p>Mural publico</p>
+          <h2>Forum organizado para mensagens, respostas e avisos da comunidade.</h2>
+        </div>
+        <div class="forum-layout">
+          <form id="postForm" class="forum-form" autocomplete="off">
+            <h3>Criar publicacao</h3>
+            <label>
+              Categoria
+              <select name="category">
+                <option>Geral</option>
+                <option>Alerta</option>
+                <option>Duvida</option>
+                <option>Relato</option>
+              </select>
+            </label>
+            <label>
+              Mensagem
+              <textarea name="content" rows="4" required placeholder="Escreva uma mensagem publica organizada."></textarea>
+            </label>
+            <div class="form-footer">
+              <p>Posts publicos ficam separados das denuncias e podem receber respostas.</p>
+              <button class="button primary" type="submit">Publicar</button>
+            </div>
+          </form>
+          <div>
+            <div class="directory-toolbar">
+              <h3>Publicacoes</h3>
+            </div>
+            <div id="postList" class="post-list"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <footer class="site-footer">
+      <p>Levadinha Advocacia Habbo</p>
+      <a href="index.html">Voltar para o inicio</a>
+    </footer>
+
+    <script src="src/services/storage.js"></script>
+    <script src="src/services/auth.js"></script>
+    <script src="src/services/users.js"></script>
+    <script src="src/services/cases.js"></script>
+    <script src="src/services/posts.js"></script>
+    <script src="src/modules/admin.js"></script>
+    <script src="src/modules/devmode.js"></script>
+    <script src="src/utils/dom.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

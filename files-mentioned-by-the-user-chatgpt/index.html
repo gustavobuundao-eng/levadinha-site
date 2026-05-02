@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Levadinha Advocacia Habbo</title>
+    <meta
+      name="description"
+      content="Escritorio virtual da advogada Levadinha para atendimento, cadastro de clientes e registro privado de ocorrencias no Habbo."
+    />
+    <link rel="preload" href="assets/levadinha-logo-novo.png" as="image" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body id="top">
+    <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+    <div class="sparkle-layer" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Voltar ao topo">
+        <img src="assets/levadinha-logo-novo.png" alt="Levadinha" />
+      </a>
+      <nav class="main-nav" aria-label="Navegacao principal">
+        <a href="index.html">Inicio</a>
+        <a href="#sobre">Sobre</a>
+        <a href="galeria.html">Galeria</a>
+        <a href="galeria.html#denuncias">Denuncias</a>
+        <a href="#clientes">Clientes</a>
+        <a href="conta.html">Conta</a>
+        <a class="premium-only" href="painel.html">Painel</a>
+      </nav>
+      <div class="header-actions">
+        <a class="developer-link premium-only" href="index.html?dev=1">Modo desenvolvedor</a>
+        <span class="header-status">Gabinete online</span>
+        <a class="nav-cta" href="#bo">Abrir caso</a>
+      </div>
+    </header>
+
+    <main id="inicio">
+      <section class="hero-section">
+        <div class="hero-copy">
+          <img class="hero-logo" src="assets/levadinha-logo-novo.png" alt="Levadinha" />
+          <p class="hero-role">Advocacia virtual para casos do Habbo</p>
+          <h1 data-edit-key="heroTitle">Defesa, estrategia e presenca para resolver conflitos dentro do jogo.</h1>
+          <p data-edit-key="heroText">
+            Atendimento organizado para jogadores que precisam relatar golpes,
+            perseguicoes, difamacao, contratos quebrados ou qualquer situacao
+            que merece uma analise cuidadosa.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#bo" data-edit-key="primaryButton">Registrar ocorrencia</a>
+            <a class="button ghost" href="#clientes" data-edit-key="secondaryButton">Ver perfis publicos</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Cartao profissional da Levadinha">
+          <div class="seal-card tilt-card">
+            <div class="pixel-window">
+              <div class="window-bar">
+                <span></span><span></span><span></span>
+              </div>
+              <div class="office-scene">
+                <img class="office-room office-pov" src="assets/levadinha-escritorio-pov.png" alt="POV do escritorio da Levadinha" />
+                <div class="room-badge">Gabinete da Levadinha</div>
+              </div>
+            </div>
+            <div class="case-summary">
+              <span>Casos no gabinete</span>
+              <strong id="caseCount">0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="stats-band" aria-label="Indicadores do site">
+        <div class="stat-card">
+          <span class="stat-icon" aria-hidden="true">V</span>
+          <span id="visitCounter" class="stat-number">0</span>
+          <p>entradas registradas neste site</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon" aria-hidden="true">C</span>
+          <span id="clientCounter" class="stat-number">0</span>
+          <p>clientes identificados</p>
+        </div>
+        <div class="stat-card">
+          <span class="stat-icon" aria-hidden="true">P</span>
+          <span id="evidenceCounter" class="stat-number">0</span>
+          <p>prints anexados em sigilo</p>
+        </div>
+      </section>
+
+      <section id="sobre" class="about-section">
+        <div class="section-heading">
+          <p>Quem sou</p>
+          <h2 class="word-hover-title">
+            <span>Levadinha</span>, <span>advogada</span> <span>do</span> <span>jogo</span>
+            <span>com</span> <span>atendimento</span> <span>firme</span>,
+            <span>elegante</span> <span>e</span> <span>organizado</span>.
+          </h2>
+        </div>
+        <div class="about-showcase">
+          <figure class="about-character-card tilt-card">
+            <img src="assets/levadinha-personagem-grande-transparent.png" alt="Retrato da personagem Levadinha" />
+            <figcaption>
+              <strong>Levadinha</strong>
+              <span>Advogada dos Habbos</span>
+            </figcaption>
+          </figure>
+          <div class="about-grid">
+            <article class="tilt-card">
+              <h3>Postura</h3>
+              <p>
+                Analiso relatos com criterio, separo fatos de rumores e organizo
+                cada detalhe para que o cliente saiba exatamente qual sera o
+                proximo passo.
+              </p>
+            </article>
+            <article class="tilt-card">
+              <h3>Sigilo</h3>
+              <p>
+                O perfil do cliente pode aparecer no site, mas o B.O. completo,
+                prints e descricao do ocorrido ficam reservados ao painel privado.
+              </p>
+            </article>
+            <article class="tilt-card">
+              <h3>Estilo</h3>
+              <p>
+                A identidade mistura brilho rosa, presenca de escritorio e a
+                energia social do Habbo, com uma experiencia limpa para clientes.
+              </p>
+            </article>
+          </div>
+        </div>
+
+        <div class="skills-panel" aria-label="Habilidades da Levadinha">
+          <article class="skill-card tilt-card">
+            <span class="skill-icon">01</span>
+            <h3>Analise de provas</h3>
+            <p>Organiza prints, conversas e datas para separar fato, suspeita e versao.</p>
+          </article>
+          <article class="skill-card tilt-card">
+            <span class="skill-icon">02</span>
+            <h3>Negociacao</h3>
+            <p>Busca acordo limpo quando ainda existe chance de resolver sem confusao.</p>
+          </article>
+          <article class="skill-card tilt-card">
+            <span class="skill-icon">03</span>
+            <h3>Defesa estrategica</h3>
+            <p>Monta argumentos com postura firme para proteger a imagem do cliente.</p>
+          </article>
+          <article class="skill-card tilt-card">
+            <span class="skill-icon">04</span>
+            <h3>Atendimento sigiloso</h3>
+            <p>Guarda B.O., prints e relato completo em area privada do gabinete.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="clientes" class="clients-section">
+        <div class="section-heading">
+          <p>Clientes</p>
+          <h2>Perfis publicos cadastrados</h2>
+        </div>
+        <div class="access-note">
+          <p id="authStatus">Para cadastrar perfil ou enviar B.O., entre em uma conta.</p>
+        </div>
+        <div class="client-layout">
+          <form id="profileForm" class="panel-form" autocomplete="off">
+            <h3>Identificacao do cliente</h3>
+            <p class="form-note">Cada conta pode salvar apenas um perfil publico.</p>
+            <label>
+              Nick no Habbo
+              <input name="nick" type="text" placeholder="Ex: Princesa.Juridica" required />
+            </label>
+            <label>
+              Cargo ou grupo
+              <input name="role" type="text" placeholder="Ex: cliente, policial, empresario" />
+            </label>
+            <label>
+              Status publico
+              <select name="status">
+                <option>Em analise</option>
+                <option>Aguardando provas</option>
+                <option>Orientado</option>
+                <option>Resolvido</option>
+              </select>
+            </label>
+            <label>
+              Bio publica
+              <textarea name="bio" rows="4" placeholder="Uma apresentacao curta que outras pessoas podem ver."></textarea>
+            </label>
+            <button class="button primary" type="submit">Salvar perfil publico</button>
+          </form>
+
+          <div>
+            <div class="directory-toolbar">
+              <h3>Diretorio visivel</h3>
+              <input id="clientSearch" type="search" placeholder="Buscar cliente" />
+            </div>
+            <div id="clientDirectory" class="client-directory" aria-live="polite"></div>
+            <div id="clientPagination" class="pagination-controls" aria-label="Paginas de clientes"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="bo" class="report-section">
+        <div class="section-heading">
+          <p>Registro privado</p>
+          <h2>Conte o que aconteceu e envie os prints do ocorrido.</h2>
+        </div>
+        <div class="case-layout">
+          <form id="caseForm" class="case-form" autocomplete="off">
+            <div class="form-grid">
+              <label>
+                Seu nick
+                <input name="clientNick" type="text" required />
+              </label>
+              <label>
+                Contato para retorno
+                <input name="contact" type="text" placeholder="Discord, WhatsApp ou outro" />
+              </label>
+              <label>
+                Pessoa envolvida
+                <input name="accused" type="text" placeholder="Nick de quem causou o problema" />
+              </label>
+              <label>
+                Data do ocorrido
+                <input name="date" type="date" />
+              </label>
+              <label>
+                Local no jogo
+                <input name="room" type="text" placeholder="Quarto, empresa, grupo ou evento" />
+              </label>
+              <label>
+                Tipo de caso
+                <select name="category">
+                  <option>Golpe ou fraude</option>
+                  <option>Difamacao</option>
+                  <option>Assedio ou perseguicao</option>
+                  <option>Contrato quebrado</option>
+                  <option>Roubo de cargo/item</option>
+                  <option>Outro</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Descricao resumida
+              <textarea name="description" rows="4" required placeholder="Conte o essencial: quem participou, o que aconteceu e quais provas existem."></textarea>
+            </label>
+            <label class="file-drop">
+              <input id="evidenceInput" name="evidence" type="file" accept="image/*" multiple />
+              <span>Adicionar prints do ocorrido</span>
+              <small>Voce pode anexar ate 5 imagens. Elas ficam no painel privado.</small>
+            </label>
+            <div id="evidencePreview" class="evidence-preview"></div>
+            <div class="form-footer">
+              <p>Cada conta pode enviar um B.O. privado para evitar registros repetidos.</p>
+              <button class="button primary" type="submit">Enviar B.O. privado</button>
+            </div>
+          </form>
+          <div class="case-guide tilt-card">
+            <span class="slot-mark">Controle</span>
+            <h3>Como funciona</h3>
+            <p>Visitantes podem ler o site. Para enviar perfil ou B.O., precisam entrar em uma conta.</p>
+            <ul>
+              <li>1 perfil publico por conta</li>
+              <li>B.O. privado sem limite de mensagens</li>
+              <li>prints ficam no painel da Levadinha</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <footer class="site-footer">
+      <p>Levadinha Advocacia Habbo</p>
+      <a href="#inicio">Voltar ao topo</a>
+    </footer>
+
+    <script src="src/services/storage.js"></script>
+    <script src="src/services/auth.js"></script>
+    <script src="src/services/users.js"></script>
+    <script src="src/services/cases.js"></script>
+    <script src="src/services/posts.js"></script>
+    <script src="src/modules/admin.js"></script>
+    <script src="src/modules/devmode.js"></script>
+    <script src="src/utils/dom.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Levadinha Advocacia Habbo</title>
+    <link rel="preload" href="assets/levadinha-logo-novo.png" as="image" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body id="top" class="auth-document">
+    <canvas id="particleCanvas" class="particle-canvas" aria-hidden="true"></canvas>
+    <div class="sparkle-layer" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Voltar para o inicio">
+        <img src="assets/levadinha-logo-novo.png" alt="Levadinha" />
+      </a>
+      <nav class="main-nav" aria-label="Navegacao principal">
+        <a href="index.html">Inicio</a>
+        <a href="index.html#sobre">Sobre</a>
+        <a href="galeria.html">Galeria</a>
+        <a href="galeria.html#denuncias">Denuncias</a>
+        <a href="conta.html">Conta</a>
+        <a class="premium-only" href="painel.html">Painel</a>
+      </nav>
+    </header>
+
+    <main class="account-page">
+      <section class="account-shell">
+        <div class="section-heading">
+          <p>Acesso</p>
+          <h1>Entre ou crie sua conta para usar os recursos do site.</h1>
+        </div>
+        <div class="auth-panel auth-page-panel">
+          <div>
+            <h3>Acesso do cliente</h3>
+            <p id="authStatus">Quem tem conta pode enviar perfil, B.O. e denuncia. Visitantes apenas visualizam.</p>
+          </div>
+          <form id="authForm" class="auth-form" autocomplete="off">
+            <input name="username" type="text" placeholder="Usuario" required />
+            <input name="password" type="password" placeholder="Senha" required />
+            <button class="button ghost" type="submit" data-auth-action="login">Entrar</button>
+            <button class="button primary" type="submit" data-auth-action="register">Criar conta</button>
+          </form>
+          <button id="logoutButton" class="button ghost" type="button" hidden>Sair da conta</button>
+        </div>
+        <div class="case-guide">
+          <span class="slot-mark">Premium</span>
+          <h3>Conta da Levadinha</h3>
+          <p>Para acessar o painel premium local: usuario <strong>levadinha</strong>, senha <strong>levadinha</strong>.</p>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="src/services/storage.js"></script>
+    <script src="src/services/auth.js"></script>
+    <script src="src/services/users.js"></script>
+    <script src="src/services/cases.js"></script>
+    <script src="src/services/posts.js"></script>
+    <script src="src/modules/admin.js"></script>
+    <script src="src/modules/devmode.js"></script>
+    <script src="src/utils/dom.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

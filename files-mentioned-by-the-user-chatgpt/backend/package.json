@@ -1,0 +1,14 @@
+{
+  "name": "levadinha-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend local simples para o site da Levadinha, preparado para futura migracao para banco/API real.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
